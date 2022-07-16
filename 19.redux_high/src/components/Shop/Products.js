@@ -5,7 +5,7 @@ const DUMMY_PRODUCT = [
   { id: "p1", price: 6, title: "book1", description: "aa" },
   { id: "p2", price: 5, title: "book2", description: "bb" },
 ];
-const Products = (props) => {
+const Products = () => {
   return (
     <section className={classes.products}>
       <h2>Buy your favorite products</h2>
