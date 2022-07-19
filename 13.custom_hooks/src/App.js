@@ -1,12 +1,47 @@
-import React from 'react';
-import BackwardCounter from './components/BackwardCounter';
-import ForwardCounter from './components/ForwardCounter';
+import React, { useEffect, useState, useCallback } from "react";
+
+import Tasks from "./components/Tasks/Tasks";
+import NewTask from "./components/NewTask/NewTask";
+
+import useHttp from "./hooks/useHttp";
 
 function App() {
+  const [tasks, setTasks] = useState([]);
+
+  const { isLoading, error, sendRequest: fetchTasks } = useHttp();
+
+  useEffect(() => {
+    console.log("USE EFFECT");
+
+    const transformTasks = (taskObj) => {
+      let loadedTasks = [];
+      for (const taskKey in taskObj) {
+        const loadedTasks = [];
+        loadedTasks.push({ id: taskKey, text: taskObj[taskKey].text });
+      }
+
+      setTasks(loadedTasks);
+    };
+
+    fetchTasks({
+      url: "https://practice-nextjs-http-default-rtdb.firebaseio.com/tasks.json",
+      transformTasks,
+    });
+  }, [fetchTasks]);
+
+  const taskAddHandler = (task) => {
+    setTasks((prevTasks) => prevTasks.concat(task));
+  };
+
   return (
     <React.Fragment>
-      <ForwardCounter />
-      <BackwardCounter />
+      <NewTask onAddTask={taskAddHandler} />
+      <Tasks
+        items={tasks}
+        loading={isLoading}
+        error={error}
+        onFetch={fetchTasks}
+      />
     </React.Fragment>
   );
 }
