@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 
 import Tasks from "./components/Tasks/Tasks";
 import NewTask from "./components/NewTask/NewTask";
-
 import useHttp from "./hooks/useHttp";
 
 function App() {
@@ -11,22 +10,22 @@ function App() {
   const { isLoading, error, sendRequest: fetchTasks } = useHttp();
 
   useEffect(() => {
-    console.log("USE EFFECT");
+    const transformTasks = (tasksObj) => {
+      const loadedTasks = [];
 
-    const transformTasks = (taskObj) => {
-      let loadedTasks = [];
-      for (const taskKey in taskObj) {
-        const loadedTasks = [];
-        loadedTasks.push({ id: taskKey, text: taskObj[taskKey].text });
+      for (const taskKey in tasksObj) {
+        loadedTasks.push({ id: taskKey, text: tasksObj[taskKey].text });
       }
 
       setTasks(loadedTasks);
     };
 
-    fetchTasks({
-      url: "https://practice-nextjs-http-default-rtdb.firebaseio.com/tasks.json",
-      transformTasks,
-    });
+    fetchTasks(
+      {
+        url: "https://practice-nextjs-http-default-rtdb.firebaseio.com/tasks.json",
+      },
+      transformTasks
+    );
   }, [fetchTasks]);
 
   const taskAddHandler = (task) => {
