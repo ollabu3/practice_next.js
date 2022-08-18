@@ -11,7 +11,7 @@ const CartItem = (props) => {
   const addItemHandler = () => {
     dispatch(cartActions.addToCart({ title, id, price }));
   };
-
+  // https://next-df601-default-rtdb.firebaseio.com/
   return (
     <li className={classes.item}>
       <header>

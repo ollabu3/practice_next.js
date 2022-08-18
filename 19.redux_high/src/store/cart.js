@@ -1,5 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+/*
+{
+    title: newItem.title,
+          id: newItem.id,
+          total: newItem.price,
+          quantity: 1,
+          price: newItem.price,
+}
+*/
 const cartState = { totalQuantity: 0, cartItems: [] };
 
 const cartSlice = createSlice({
@@ -12,7 +21,10 @@ const cartSlice = createSlice({
         (item) => item.id === newItem.id
       );
       state.totalQuantity++;
-      if (!exisitedItem) {
+      if (exisitedItem) {
+        exisitedItem.quantity++;
+        exisitedItem.total = exisitedItem.total + exisitedItem.price;
+      } else {
         state.cartItems.push({
           title: newItem.title,
           id: newItem.id,
@@ -20,9 +32,6 @@ const cartSlice = createSlice({
           quantity: 1,
           price: newItem.price,
         });
-      } else {
-        exisitedItem.quantity++;
-        exisitedItem.total = exisitedItem.total + exisitedItem.price;
       }
     },
     removeToCart(state, action) {
@@ -34,8 +43,6 @@ const cartSlice = createSlice({
         (item) => item.id === newItem.id
       );
       if (exisitedItem.quantity === 1) {
-        console.log({ id: newItem.id });
-        console.log(state.cartItems.filter((item) => item.id !== newItem.id));
         state.cartItems = state.cartItems.filter(
           (item) => item.id !== newItem.id
         );
