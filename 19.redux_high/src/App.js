@@ -4,22 +4,27 @@ import Cart from "./components/Cart/Cart";
 import Layout from "./components/Layout/Layout";
 import Products from "./components/Shop/Products";
 import Notification from "./components/UI/Notification";
-import { sendCartData } from "./store/cart";
+import { sendCartData, fetchCartData } from "./store/actions/cart";
 let isInitial = true;
 
 function App() {
   const dispatch = useDispatch();
   const { isToggled } = useSelector((state) => state.ui);
-  const cart = useSelector((state) => state.cart);
+  const { cart } = useSelector((state) => state);
   const { notification } = useSelector((state) => state.ui);
+
+  useEffect(() => {
+    dispatch(fetchCartData());
+  }, []);
 
   useEffect(() => {
     if (isInitial) {
       isInitial = false;
       return;
     }
-
-    dispatch(sendCartData(cart));
+    if (cart.changed) {
+      dispatch(sendCartData(cart));
+    }
   }, [cart, dispatch]);
 
   return (
