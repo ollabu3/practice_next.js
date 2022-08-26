@@ -1,13 +1,13 @@
-import { Route, useParams, Link } from "react-router-dom";
+import { Route, useParams, Link, useRouteMatch } from "react-router-dom";
 import React, { Fragment } from "react";
 import Comments from "../components/comments/Comments";
 import HighlightedQuote from "../components/quotes/HighlightedQuote";
 
-const QuoteDetail = () => {
+const QuoteDetail = ({ match }) => {
+  const routeMatch = useRouteMatch(); // 현재 route표시
   const params = useParams(); // route params 가져오기
-  console.log({ params });
   const quote = DummyData.find((quote) => quote.id === params.quotesId);
-  console.log({ quote });
+  console.log({ routeMatch, match });
 
   if (!quote) {
     // 없을 경우
@@ -16,18 +16,15 @@ const QuoteDetail = () => {
   return (
     <Fragment>
       <HighlightedQuote text={quote.text} author={quote.author} />
-      <Route path={`/quotes/${params.quotesId}`} exact>
+      <Route path={routeMatch.path} exact>
         <div className="centered">
-          <Link
-            className="btn--flat"
-            to={`/quotes/${params.quotesId}/comments`}
-          >
+          <Link className="btn--flat" to={`${routeMatch.url}/comments`}>
             Load Comments
           </Link>
         </div>
       </Route>
 
-      <Route path={`/quotes/${params.quotesId}/comments`}>
+      <Route path={`${routeMatch.path}/comments`}>
         <Comments />
       </Route>
     </Fragment>
