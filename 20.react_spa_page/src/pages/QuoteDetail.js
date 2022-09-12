@@ -1,21 +1,41 @@
 import { Route, useParams, Link, useRouteMatch } from "react-router-dom";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import Comments from "../components/comments/Comments";
 import HighlightedQuote from "../components/quotes/HighlightedQuote";
+import useHttp from "../hooks/useHttp";
+import { getSingleQuote } from "../lib/api";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const QuoteDetail = ({ match }) => {
   const routeMatch = useRouteMatch(); // 현재 route표시
   const params = useParams(); // route params 가져오기
-  const quote = DummyData.find((quote) => quote.id === params.quotesId);
-  console.log({ routeMatch, match });
+  const {
+    sendRequest,
+    status,
+    data: loadedQuote,
+    error,
+  } = useHttp(getSingleQuote, true);
+  const { quoteId } = params;
 
-  if (!quote) {
+  useEffect(() => {
+    sendRequest(quoteId);
+  }, [sendRequest, quoteId]);
+
+  if (status === "panding") {
+    return <LoadingSpinner />;
+  }
+  if (error) {
+    return <p className="centered">{error}</p>;
+  }
+  if (loadedQuote) {
     // 없을 경우
     return <p>No Quote found!</p>;
   }
+  console.log({ routeMatch, match });
+
   return (
     <Fragment>
-      <HighlightedQuote text={quote.text} author={quote.author} />
+      <HighlightedQuote text={loadedQuote.text} author={loadedQuote.author} />
       <Route path={routeMatch.path} exact>
         <div className="centered">
           <Link className="btn--flat" to={`${routeMatch.url}/comments`}>
@@ -32,8 +52,3 @@ const QuoteDetail = ({ match }) => {
 };
 
 export default QuoteDetail;
-
-const DummyData = [
-  { id: "q1", author: "Max", text: "Text1" },
-  { id: "q2", author: "Min", text: "Text2" },
-];
