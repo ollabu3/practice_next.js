@@ -1,31 +1,42 @@
+import React, { Suspense } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import NewQuotes from "./pages/NewQuotes";
-import QuoteDetail from "./pages/QuoteDetail";
-import Quotes from "./pages/Quotes";
+
 import Layout from "./components/layout/Layout";
-import NotFound from "./pages/NotFound";
+import LoadingSpinner from "./components/ui/LoadingSpinner";
+
+const NewQuote = React.lazy(() => import("./pages/NewQuote"));
+const QuoteDetail = React.lazy(() => import("./pages/QuoteDetail"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const AllQuotes = React.lazy(() => import("./pages/Quotes"));
 
 function App() {
   return (
     <Layout>
-      <Switch>
-        <Route path="/" exact>
-          <Redirect to="/quotes" /> {/*  root 경로일 시 */}
-        </Route>
-        <Route path="/quotes" exact>
-          <Quotes />
-        </Route>
-        <Route path="/quotes/:quotesId">
-          <QuoteDetail />
-        </Route>
-        <Route path="/new-quote">
-          <NewQuotes />
-        </Route>
-        <Route path="*">
-          {/*  이상한 경로로 접근 시 일치하는 라우트 없으니까 계속 내려오다 여기로 접근*/}
-          <NotFound />
-        </Route>
-      </Switch>
+      <Suspense
+        fallback={
+          <div className="centered">
+            <LoadingSpinner />
+          </div>
+        }
+      >
+        <Switch>
+          <Route path="/" exact>
+            <Redirect to="/quotes" />
+          </Route>
+          <Route path="/quotes" exact>
+            <AllQuotes />
+          </Route>
+          <Route path="/quotes/:quoteId">
+            <QuoteDetail />
+          </Route>
+          <Route path="/new-quote">
+            <NewQuote />
+          </Route>
+          <Route path="*">
+            <NotFound />
+          </Route>
+        </Switch>
+      </Suspense>
     </Layout>
   );
 }

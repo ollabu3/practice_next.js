@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-import useHttp from "../../hooks/use-http";
+import useHttp from "../../hooks/useHttp";
 import { addComment } from "../../lib/api";
 import LoadingSpinner from "../UI/LoadingSpinner";
 import classes from "./NewCommentForm.module.css";
