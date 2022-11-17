@@ -1,54 +1,68 @@
-import { useRef, useState } from "react";
+import React, { useState, useRef, useContext } from "react";
+import { useHistory } from "react-router-dom";
+import AuthContext from "../../store/auth.context";
 
 import classes from "./AuthForm.module.css";
 
 const AuthForm = () => {
+  const history = useHistory();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
+
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  const auth = useContext(AuthContext);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
 
   const submitHandler = (e) => {
-    console.log("submit");
     e.preventDefault();
+    const enteredEmail = emailInputRef.current.value;
+    const enteredPassword = passwordInputRef.current.value;
 
-    const enterdEmail = emailInputRef.current.value;
-    const enterdPassword = passwordInputRef.current.value;
     setIsLoading(true);
     let url = "";
     if (isLogin) {
+      // 로그인이면
       url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDq86oI0za8ORbMctd2T9yzACwGfbi2_vQ";
     } else {
-      // 로그인 안돼있으면
-      url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
+      // 회원가입이면
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDq86oI0za8ORbMctd2T9yzACwGfbi2_vQ";
     }
     fetch(url, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        email: enterdEmail,
-        password: enterdPassword,
+        email: enteredEmail,
+        password: enteredPassword,
         returnSecureToken: true,
       }),
-      headers: { "Content-Type": "application/json" },
     })
       .then((res) => {
         setIsLoading(false);
         if (res.ok) {
           return res.json();
         } else {
-          res.json().then((_) => {
-            let errorMessage = "인증 실패!";
+          return res.json().then((data) => {
+            let errorMessage = "인증 실패";
+            if (data && data.error && data.error.message) {
+              errorMessage = data.error.message;
+            }
+            alert(errorMessage);
             throw new Error(errorMessage);
           });
         }
       })
       .then((data) => {
-        console.log(data);
+        auth.login(data.idToken);
+        history.replace("/");
       })
       .catch((err) => {
         alert(err.message);
@@ -76,7 +90,7 @@ const AuthForm = () => {
           {!isLoading && (
             <button>{isLogin ? "Login" : "Create Account"}</button>
           )}
-          {isLoading && <p className={classes.auth}>Loading....</p>}
+          {isLoading && <p>Sending request....</p>}
           <button
             type="button"
             className={classes.toggle}
