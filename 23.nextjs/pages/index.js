@@ -26,7 +26,7 @@ export async function getStaticProps() {
     props: {
       meetups: DATA_MEETUPS,
     },
-    revalidate: 1, // 페이지에 요청이 새로 들어오면 10초에서 서버를 다시 생성
+    revalidate: 3600, // 페이지에 요청이 새로 들어오면 10초에서 서버를 다시 생성
   };
 }
 
